@@ -1,0 +1,211 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@model WebApplication1.Models.Khoa
+
+<div class="content-wrapper">
+    <div class="row">
+        
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Danh Sach Khoa</h4>
+                    <p class="card-description">
+                        <a href="#" id="addKhoaBtn">
+                            <button type="button" class="btn btn-link btn-rounded btn-fw">Them Khoa</button>
+                            </a>
+                    </p>
+                    <div class="table-responsive">
+                        <table id="dsKhoa" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ma Khoa</th>
+                                    <th>Ten Khoa</th>   
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var k in ViewBag.khoas)
+                                {
+                                    <tr> 
+                                        <td>@k.Makhoa</td>
+                                        <td>@k.Tenkhoa</td>
+                                        <td>
+                                            <a href="#" class="deleteBtn" value="@k.Makhoa">
+                                                <button type="button" class="btn btn-danger btn-rounded btn-fw"> Delete </button>
+                                            </a>
+                                            <a href="#" class="editBtn" value="@k.Makhoa">
+                                                <button type="button" class="btn btn-info btn-rounded btn-fw"> Edit </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 id="khoa-input-form-title" class="card-title">
+                       Them Khoa
+                    </h4>
+                
+                    <form class="forms-sample" id="khoa-input-form" method="post" >
+                        <div class="form-group row">
+                            <label for="inputTenkhoa" class="col-sm-3 col-form-label">Ten Khoa</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="inputTenkhoa" placeholder="Nhap Ten Khoa">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                       @* <input type="hidden" asp-for="Makhoa"  />*@
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    #dsKhoa thead th:nth-child(3) {
+        text-align: center;
+    }
+    #dsKhoa tbody tr td:nth-child(3) {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+</style>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $(document).on('click', '.deleteBtn', function (e) {
+            e.preventDefault;
+            var idKhoa = $(this).attr('value');
+            $.ajax({
+                type: 'GET',
+                url: '/admin/home/removeKhoa',
+                data: {
+                    id: idKhoa
+                },
+                success: function (data) {
+                   if (data.isSuccessful) {
+                       fetchKhoa();
+                   } else {
+                       alert("Xoa khong thanh cong!")
+                   }
+                }
+            });
+        });
+        
+        $(document).on('click', '#addKhoaBtn', function(e) {
+            e.preventDefault();
+            if ($("#inputIdKhoa").length > 0)
+            {
+                $('#inputIdKhoa').remove()
+            }
+            $("#inputTenkhoa").val("");
+            $('#khoa-input-form-title').html("Them Khoa");
+        });
+
+
+        $(document).on('submit', '#khoa-input-form', function (e) {
+            e.preventDefault();
+            var tenKhoa = $('#inputTenkhoa').val();
+            
+
+            if ($("#inputIdKhoa").length > 0) {
+                var idKhoa = $('#inputIdKhoa').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/home/editKhoa',
+                    data:
+                    {
+                        id : idKhoa,
+                        tenKhoa : tenKhoa
+                    },
+                    success: function(data) {
+                        if (data.isSuccessful) {
+                            fetchKhoa();
+                            
+                        } else {
+                            alert("Sua Khong Thanh Cong");
+                        }
+                    }
+
+                });
+            } 
+            else
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/home/addKhoa',
+                    data: {
+                        tenKhoa : tenKhoa
+                    },
+                    success: function(data) {
+
+                        if (data.isSuccessful) {
+                            fetchKhoa();
+                        } else { 
+                            alert("Them Khong Thanh Cong");
+                        }
+                    }
+                });
+            }
+        });
+       
+        $(document).on('click', '.editBtn', function (e) {
+            e.preventDefault();
+            if ($("#inputIdKhoa").length > 0) {
+                $("#inputIdKhoa").remove();
+            }
+            $('#khoa-input-form-title').html("Sua Khoa");
+            var idKhoa = $(this).attr('value');
+            $.ajax({
+                type: 'GET',
+                url: '/admin/home/editKhoa',
+                data: {
+                    id: idKhoa
+                },
+                success: function(data) {
+                    $('#inputTenkhoa').val(data.khoa.tenkhoa);
+                    var html = '<input type="hidden" id="inputIdKhoa" value="' + idKhoa + '" />';
+                    $('#khoa-input-form').append(html);
+                }
+            });
+           
+        }); 
+
+
+        function fetchKhoa() {
+            $.ajax({
+                type: 'GET',
+                url: '/admin/home/fetchKhoa',
+                success: function (data) {
+                    var html = "";
+                    $.each(data.khoas, function (i, khoa) {
+                        html += '<tr><td>' + khoa.makhoa + '</td>';
+                        html += '<td>' + khoa.tenkhoa + '</td>';
+                        html += '<td>';
+                        html += '<a href="#" class="deleteBtn" value="' + khoa.makhoa + '" >';
+                        html += '<button type="button" class="btn btn-danger btn-rounded btn-fw"> Delete </button>';
+                        html += '</a>';
+                        html += '<a href="#" class="editBtn" value="' + khoa.makhoa + '" >';
+                        html += '<button type="button" class="btn btn-info btn-rounded btn-fw"> Edit </button>';
+                        html += '</a>';
+                        html += '</td>';
+
+                        html +='</tr>';
+                    });
+                    $('#dsKhoa tbody').html(html);
+                }
+            });
+        }
+    });       
+</script>

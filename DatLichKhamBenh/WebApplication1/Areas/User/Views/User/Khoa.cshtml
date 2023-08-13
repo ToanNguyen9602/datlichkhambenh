@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Areas/User/Views/Shared/_Layout.cshtml";
+}
+@model WebApplication1.Models.Khoa
+
+<div class="content-wrapper">
+    <div class="row">
+        
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Danh Sach Khoa</h4>
+                    <p class="card-description">
+                    </p>
+                    <div class="table-responsive">
+                        <table id="dsKhoa" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ma Khoa</th>
+                                    <th>Ten Khoa</th>   
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var k in ViewBag.khoas)
+                                {
+                                    <tr> 
+                                        <td>@k.Makhoa</td>
+                                        <td>@k.Tenkhoa</td>
+                                        <td>
+                                            <a asp-area="user" asp-controller="user" asp-action="dsBacsi" asp-route-id="@k.Makhoa" class="editBtn" >
+                                                <button type="button" class="btn btn-info btn-rounded btn-fw">Danh Sach Bac Si</button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+</div>
+<style>
+    #dsKhoa thead th:nth-child(3) {
+        text-align: center;
+    }
+    #dsKhoa tbody tr td:nth-child(3) {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+</style>

@@ -1,0 +1,155 @@
+﻿@{
+    Layout = "~/Areas/User/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<style>
+    #noidung {
+        height: 260px;
+    }
+</style>
+<div class="content-wrapper">
+    <div class="row">
+        
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Danh Sach Bac Si Thuoc Khoa @ViewBag.khoa.Tenkhoa</h4>
+                    <p class="card-description">
+                        <a asp-area="user" asp-controller="user" asp-action="index">
+                            <button type="button" class="btn btn-primary mr-2">Back</button>
+                            </a>
+                        
+                    </p>
+                    <div class="table-responsive">
+                        <table id="dsBacsi" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ma BS</th>
+                                    <th>Ten BS</th>   
+                                    <th>Ngay Sinh</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var b in ViewBag.bacsis)
+                                {
+                                    <tr> 
+                                        <td>@b.Mabs</td>
+                                        <td>@b.Tenbs</td>
+                                        <td>@b.Ngaysinh.ToString("dd/MM/yyyy")</td>
+                                        
+                                        <td>
+                                            <a href="#" class="datLichKham" value="@b.Mabs">
+                                                <button type="button" class="btn btn-info btn-rounded btn-fw"> Dat Lich Kham </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 id="bacsi-input-form-title" class="card-title">
+                       Dat Lich Kham
+                    </h4>
+                
+                    <form class="forms-sample" id="datLichKhamForm" method="post" >
+                        <div class="form-group row">
+                            <label for="noidung" class="col-sm-3 col-form-label">Noi Dung</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" id="noidung" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Ngay Kham</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="ngaykham" placeholder="mm/dd/yyyy">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mr-2">Xac Nhan</button>
+                        <input type="hidden" id="idBacsiHidden" />
+                       @* <input type="hidden" asp-for="Makhoa"  />*@
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    #dsBacsi thead th:nth-child(4) {
+        text-align: center;
+    }
+
+    #dsBacsi tbody tr td:nth-child(4) {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+</style>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(function () {
+            $("#ngaykham").datepicker({ minDate: 0, maxDate: "+1M +10D" });
+        });
+   
+
+
+        $(document).on('submit', '#datLichKhamForm', function (e) {
+            e.preventDefault();
+            var mabs = $("#idBacsiHidden").val();
+            var ngaykham = $("#ngaykham").val();
+            var noidung = $("#noidung").val()
+            
+            $.ajax({
+                type: 'POST',
+                url: '/user/user/datLichKham',
+                data: {
+                    mabs: mabs,
+                    ngaykham: ngaykham,
+                    noidung: noidung
+                },
+                success: function(data) {
+                    if (data.isSuccessful) {
+                        alert("Dat Lich Kham Thanh Cong");
+                    } else {
+                        alert("Dat Lich Kham Khong Thanh Cong!")
+                    }
+                }
+            });
+
+           
+        });
+       
+        $(document).on('click', '.datLichKham', function (e) {
+            e.preventDefault();
+            var idBacsi = $(this).attr('value');
+            $("#idBacsiHidden").val(idBacsi);
+            $.ajax({
+                type: 'GET',
+                url: '/user/user/getBsById',
+                data: {
+                    id: idBacsi
+                },
+                success: function(data) {
+                    $('#bacsi-input-form-title').html("Dat Lich Kham Voi Bac Si " + data.bs.tenbs);
+                }
+            });
+           
+        }); 
+
+
+        
+    });       
+</script>

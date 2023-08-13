@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "~/Areas/User/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Thong Tin Benh Nhan</h4>
+            @{
+                var bn = ViewBag.bn;
+            }
+            <div class="forms-sample">
+                <div class="form-group row">
+                    <label  class="col-sm-3 col-form-label">Ma Benh Nhan</label>
+                    <div class="col-sm-9">
+                        <label class="col-sm-3 col-form-label">@bn.Mabn</label>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Ten Benh Nhan</label>
+                    <div class="col-sm-9">
+                        <label class="col-sm-3 col-form-label">@bn.Tenbn.ToUpper()</label>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Ngay Sinh</label>
+                    <div class="col-sm-9">
+                        <label class="col-sm-3 col-form-label">@bn.Ngaysinh.ToString("MM/dd/yyyy")</label>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Gioi Tinh</label>
+                    <div class="col-sm-9">
+                        <label class="col-sm-3 col-form-label">@bn.Gioitinh.ToUpper()</label>
+                    </div>
+                </div>
+             
+            </div>
+
+        </div>
+    </div>
+</div>

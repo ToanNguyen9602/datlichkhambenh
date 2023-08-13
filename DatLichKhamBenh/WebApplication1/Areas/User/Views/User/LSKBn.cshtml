@@ -1,0 +1,61 @@
+﻿@{
+    Layout = "~/Areas/User/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<div class="content-wrapper">
+    <div class="row">
+
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    @{
+                        var tenbn = HttpContextAccessor.HttpContext.Session.GetString("tenbn");
+                    }
+                    <h4 class="card-title">Lich kham cua ben nhan @tenbn.ToUpper()</h4>
+       
+                    <div class="table-responsive">
+                        <table id="dsLK" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Id
+                                    </th>
+                                    <th>
+                                        Bac Si
+                                    </th>
+                                    <th>
+                                        Ngay Kham
+                                    </th>
+                                    <th>
+                                        Noi Dung
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var lk in ViewBag.lichkhams)
+                                {
+                                    <tr>
+                                        <td class="py-1">
+                                            @lk.Id
+                                        </td>
+                                        <td>
+                                           @lk.Bacsi.Tenbs
+                                        </td>
+                                        <td>
+                                            @lk.Ngaykham.ToString("MM/dd/yyyy")
+                                        </td>
+                                        <td>
+                                            @lk.Noidung
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

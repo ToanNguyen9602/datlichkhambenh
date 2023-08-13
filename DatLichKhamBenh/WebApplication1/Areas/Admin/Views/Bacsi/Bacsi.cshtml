@@ -1,0 +1,252 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<div class="content-wrapper">
+    <div class="row">
+        
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Danh Sach Bac Si</h4>
+                    <p class="card-description">
+                        <a href="#" id="addBacsiBtn"><button type="button" class="btn btn-link btn-rounded btn-fw">Them Bac Si</button></a>
+                        
+                    </p>
+                    <div class="table-responsive">
+                        <table id="dsBacsi" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ma BS</th>
+                                    <th>Ten BS</th>   
+                                    <th>Ngay Sinh</th>
+                                    <th>Khoa</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var b in ViewBag.bacsis)
+                                {
+                                    <tr> 
+                                        <td>@b.Mabs</td>
+                                        <td>@b.Tenbs</td>
+                                        <td>@b.Ngaysinh.ToString("dd/MM/yyyy")</td>
+                                        <td>@b.Khoa</td>
+                                        <td>
+                                            <a href="#" class="deleteBtn" value="@b.Mabs">
+                                                <button type="button" class="btn btn-danger btn-rounded btn-fw"> Delete </button>
+                                            </a>
+                                            <a href="#" class="editBtn" value="@b.Mabs">
+                                                <button type="button" class="btn btn-info btn-rounded btn-fw"> Edit </button>
+                                            </a>
+                                            <a asp-area="admin" asp-controller="bacsi" asp-action="info" asp-route-id="@b.Mabs" class="infoBtn" value="@b.Mabs">
+                                                <button type="button" class="btn btn-info btn-rounded btn-fw"> Info </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 id="bacsi-input-form-title" class="card-title">
+                       Them Bac Si
+                    </h4>
+                
+                    <form class="forms-sample" id="bacsi-input-form" method="post" >
+                        <div class="form-group row">
+                            <label for="inputTenbs" class="col-sm-3 col-form-label">Ten Bac Si</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="inputTenbs" placeholder="Nhap Ten Bac Si">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Ngay Sinh</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="ngaysinh" placeholder="mm/dd/yyyy">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect2">Bac si thuoc khoa</label>
+                            <select class="form-control" id="khoaSelect">
+                                @foreach (var k in ViewBag.khoas)
+                                {
+                                    <option value="@k.Makhoa">@k.Tenkhoa</option>
+              
+                                }
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                       @* <input type="hidden" asp-for="Makhoa"  />*@
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    #dsBacsi thead th:nth-child(5) {
+        text-align: center;
+    }
+
+    #dsBacsi tbody tr td:nth-child(5) {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+</style>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(function () {
+            $("#ngaysinh").datepicker();
+        });
+        $(document).on('click', '.deleteBtn', function (e) {
+            e.preventDefault;
+            var idBacsi = $(this).attr('value');
+            $.ajax({
+                type: 'GET',
+                url: '/admin/bacsi/removeBacsi',
+                data: {
+                    id: idBacsi
+                },
+                success: function (data) {
+                   if (data.isSuccessful) {
+                       fetchBacsi();
+                   } else {
+                       alert("Xoa khong thanh cong!")
+                   }
+                }
+            });
+        });
+        
+        $(document).on('click', '#addBacsiBtn', function(e) {
+            e.preventDefault();
+            if ($("#inputIdBacsi").length > 0)
+            {
+                $('#inputIdBacsi').remove()
+            }
+            $("#inputTenbs").val("");
+            $("#ngaysinh").val("");
+            $('#bacsi-input-form-title').html("Them Bac Si");
+        });
+
+
+        $(document).on('submit', '#bacsi-input-form', function (e) {
+            e.preventDefault();
+            var tenbs = $('#inputTenbs').val();
+            var khoaId = $('#khoaSelect').val();
+            var ngaysinh = $('#ngaysinh').val();
+            
+
+            if ($("#inputIdBacsi").length > 0) {
+                var idBs = $('#inputIdBacsi').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/bacsi/editBacsi',
+                    data:
+                    {
+                        id: idBs,
+                        tenbs: tenbs,
+                        khoaId: khoaId,
+                        ngaysinh: ngaysinh
+                    },
+                    success: function(data) {
+                        if (data.isSuccessful) {
+                            fetchBacsi();
+                            
+                        } else {
+                            alert("Sua Khong Thanh Cong");
+                        }
+                    }
+
+                });
+            } 
+            else
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/bacsi/addBacsi',
+                    data: {
+                        tenbs: tenbs,
+                        khoaId: khoaId,
+                        ngaysinh: ngaysinh
+                    },
+                    success: function(data) {
+                        if (data.isSuccessful) {
+                            fetchBacsi();
+                        } else { 
+                            alert("Them Khong Thanh Cong");
+                        }
+                    }
+                });
+            }
+        });
+       
+        $(document).on('click', '.editBtn', function (e) {
+            e.preventDefault();
+            if ($("#inputIdBacsi").length > 0) {
+                $("#inputIdBacsi").remove();
+            }
+            var idBacsi = $(this).attr('value');
+            $('#bacsi-input-form-title').html("Sua Thong Tin Bac Si");
+            $.ajax({
+                type: 'GET',
+                url: '/admin/bacsi/editBacsi',
+                data: {
+                    id: idBacsi
+                },
+                success: function(data) {
+                    $('#inputTenbs').val(data.bacsi.tenbs);
+                    var ns = new Date(data.bacsi.ngaysinh);
+                    $('#ngaysinh').val((ns.getMonth()+1) + '/' + ns.getDate() + '/' + ns.getFullYear());
+                    $('#khoaSelect').val(data.bacsi.makhoa);
+                    var html = '<input type="hidden" id="inputIdBacsi" value="' + idBacsi + '" />';
+                    $('#bacsi-input-form').append(html);
+                }
+            });
+           
+        }); 
+
+
+        function fetchBacsi() {
+            $.ajax({
+                type: 'GET',
+                url: '/admin/bacsi/fetchBacsi',
+                success: function (data) {
+                    var html = "";
+                    $.each(data.bacsis, function (i, b) {
+                        html += '<tr><td>' + b.mabs + '</td>';
+                        html += '<td>' + b.tenbs + '</td>';
+                        var ns = new Date(b.ngaysinh);
+                        html += '<td>' + ns.getDate() + '/' + (ns.getMonth()+1) + '/' + ns.getFullYear() + '</td>';
+                        html += '<td>' + b.khoa + '</td>';
+                        html += '<td>';
+                        html += '<a href="#" class="deleteBtn" value="' + b.mabs + '" >';
+                        html += '<button type="button" class="btn btn-danger btn-rounded btn-fw"> Delete </button>';
+                        html += '</a>';
+                        html += '<a href="#" class="editBtn" value="' + b.mabs + '" >';
+                        html += '<button type="button" class="btn btn-info btn-rounded btn-fw"> Edit </button>';
+                        html += '</a>';
+                        html += '<a asp-area="admin" asp-controller="bacsi" asp-action="info" asp-route-id="' + b.Mabs + '"  class="infoBtn" value="' + b.Mabs + '">';
+                        html += '<button type="button" class="btn btn-info btn-rounded btn-fw"> Info </button></a>'
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+                    $('#dsBacsi tbody').html(html);
+                }
+            });
+        }
+    });       
+</script>

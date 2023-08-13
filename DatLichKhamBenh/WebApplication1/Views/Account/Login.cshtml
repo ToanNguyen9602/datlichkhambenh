@@ -1,0 +1,12 @@
+﻿<h3>Login</h3>
+<form method="post" asp-controller="account" asp-action="login">
+    Username <input type="text" name="username" />
+    <br />
+    Password <input type="password" name="password" />
+    <br />
+    <input type="submit" value="Login" />
+    <br />
+    <a asp-controller="account" asp-action="register">Register</a>
+    <br />
+    <a asp-controller="account" asp-action="forgetPassword">Forget Password</a>
+</form>
